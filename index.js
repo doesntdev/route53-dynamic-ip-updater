@@ -3,7 +3,6 @@ const AWS = require("aws-sdk");
 const dotenv = require("dotenv");
 dotenv.config();
 
-console.log(process.env.AWS_ACCESS_KEY_ID);
 const route53 = new AWS.Route53();
 
 const ipdata = () => {
@@ -14,17 +13,17 @@ const ipdata = () => {
     });
 };
 
-const updateroute53 = (data) => {
+const updateroute53 = (ipaddress) => {
   var params = {
     ChangeBatch: {
       Changes: [
         {
           Action: "UPSERT",
           ResourceRecordSet: {
-            Name: "games.loganh.art",
+            Name: process.env.RESOURCE_RECORDSET_NAME,
             ResourceRecords: [
               {
-                Value: data,
+                Value: ipaddress,
               },
             ],
             TTL: 60,
@@ -34,7 +33,7 @@ const updateroute53 = (data) => {
       ],
       Comment: "Dynamic DNS update",
     },
-    HostedZoneId: "Z07467821BBWM2K1I4AMS",
+    HostedZoneId: process.env.HOSTEDZONEID,
   };
 
   route53.changeResourceRecordSets(params, function (err, data) {
